@@ -18,9 +18,10 @@ import os
 code_version = os.getenv('CODE_VERSION')
 api_key = os.getenv('API_KEY')
 api_secret = os.getenv('API_SECRET')
-max_items = os.getenv('MAX_ITEMS')
 output_file = os.getenv('OUTPUT_FILE')
 rss_link = os.getenv('RSS_LINK')
+max_items = int(os.getenv('MAX_ITEMS'))
+min_make_len = int(os.getenv('MIN_MAKE_LEN'))
 
 # SET UP ----
 flickr = flickrapi.FlickrAPI(api_key, api_secret, format='etree') #json or etree
@@ -117,6 +118,23 @@ for i in range(len(ids)):
         print(xml_str)
 
         # Example <exif label="Exposure"><raw>text>
+        tmp_xpath = './/exif[@label="Make"]/raw'
+        if rsp_exif.find(tmp_xpath) is not None: 
+            make = rsp_exif.find(tmp_xpath).text
+        else:
+            make = "NA"
+
+        # Skip rest of iteration if missing EXIF data
+        if len(make) < min_make_len:
+            print(f"ERROR: ID: {img_id}: MISSING EXIF DATA")
+            continue
+
+        tmp_xpath = './/exif[@label="Model"]/raw'
+        if rsp_exif.find(tmp_xpath) is not None: 
+            model = rsp_exif.find(tmp_xpath).text
+        else:
+            model = "NA"
+
         tmp_xpath = './/exif[@label="Exposure"]/raw'
         if rsp_exif.find(tmp_xpath) is not None: 
             shutter_speed = rsp_exif.find(tmp_xpath).text
@@ -140,18 +158,6 @@ for i in range(len(ids)):
             focal_length = rsp_exif.find(tmp_xpath).text
         else:
             focal_length = "NA"
-
-        tmp_xpath = './/exif[@label="Make"]/raw'
-        if rsp_exif.find(tmp_xpath) is not None: 
-            make = rsp_exif.find(tmp_xpath).text
-        else:
-            make = "NA"
-
-        tmp_xpath = './/exif[@label="Model"]/raw'
-        if rsp_exif.find(tmp_xpath) is not None: 
-            model = rsp_exif.find(tmp_xpath).text
-        else:
-            model = "NA"
 
         tmp_xpath = './/exif[@label="Exposure Program"]/raw'
         if rsp_exif.find(tmp_xpath) is not None: 
