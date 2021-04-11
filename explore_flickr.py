@@ -20,6 +20,7 @@ api_key = os.getenv('API_KEY')
 api_secret = os.getenv('API_SECRET')
 max_items = os.getenv('MAX_ITEMS')
 output_file = os.getenv('OUTPUT_FILE')
+rss_link = os.getenv('RSS_LINK')
 
 # SET UP ----
 flickr = flickrapi.FlickrAPI(api_key, api_secret, format='etree') #json or etree
@@ -93,7 +94,7 @@ channel = ET.SubElement(rss, 'channel')
 title = ET.SubElement(channel, 'title')
 title.text = "Explore Flickr"
 link = ET.SubElement(channel, 'link')
-link.text = "http://lunean.com/explore_flickr_rss/rss_tmp.xml"
+link.text = rss_link
 description = ET.SubElement(channel, 'description')
 description.text = "Explore Flickr"
 last_build_date = ET.SubElement(channel, 'lastBuildDate')
